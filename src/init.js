@@ -6,7 +6,7 @@
 /*jslint devel: true, forin: true, newcap: true, plusplus: true*/
 /*jslint white: true, continue:true, indent: 2*/
 
-/*global vgl, ogs, vec4, inherit, $*/
+/*global vgl, ogs, vec4, inherit, window, $*/
 //////////////////////////////////////////////////////////////////////////////
 
 if(typeof ogs === 'undefined') {
@@ -81,3 +81,32 @@ Object.size = function(obj) {
   }
   return size;
 };
+
+//////////////////////////////////////////////////////////////////////////////
+/**
+ * Create a requirejs `define` shim if it is not loaded
+ *
+ * @param {string} name
+ * @param {Array} deps
+ * @param {Function} moduleLoader
+ * 
+ */
+//////////////////////////////////////////////////////////////////////////////
+if (window && window.define === undefined) {
+    window.define = function (name, deps, moduleLoader) {
+        var nmList = name.split('.'),
+            baseName = nmList.pop(),
+            nmSpace = ogs.namespace(nmList.join('.')),
+            depObjs = [];
+        
+        // pack dependencies into an array
+        deps.forEach(function (dep) {
+            var depObj = ogs.namespace(dep);
+            depObjs.push(depObj);
+        });
+        
+        // call moduleLoader with dependencies objects
+        nmSpace[baseName] = moduleLoader.apply(this, depObjs);
+    };
+}
+
