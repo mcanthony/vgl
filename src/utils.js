@@ -429,7 +429,7 @@ vgl.utils.createPointSpritesFragmentShader = function(context) {
         'void main(void) {',
         'highp vec4 texColor = texture2D(sampler2d, gl_PointCoord);',
         'highp vec3 finalColor = iVertexColor * vertexColorWeight + (1.0 - vertexColorWeight) * texColor.xyz;',
-        'gl_FragColor = vec4(finalColor, opacity * texColor.w);',
+        'gl_FragColor = vec4(finalColor, 0.2 * texColor.w);',
         '}' ].join('\n'),
     shader = new vgl.shader(gl.FRAGMENT_SHADER);
 
@@ -743,7 +743,7 @@ vgl.utils.createPointSpritesMaterial = function(image) {
       fragmentShader = vgl.utils.createPointSpritesFragmentShader(gl),
       posVertAttr = new vgl.vertexAttribute("vertexPosition"),
       colorVertAttr = new vgl.vertexAttribute("vertexColor"),
-      pointsizeUniform = new vgl.floatUniform("pointSize", 5.0),
+      pointsizeUniform = new vgl.floatUniform("pointSize", 20.0),
       opacityUniform = new vgl.floatUniform("opacity", 1.0),
       vertexColorWeightUniform =
         new vgl.floatUniform("vertexColorWeight", 0.0),
