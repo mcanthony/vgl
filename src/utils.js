@@ -394,7 +394,6 @@ vgl.utils.createPointSpritesVertexShader = function(context) {
   'use strict';
   var vertexShaderSource = [
         'attribute vec3 vertexPosition;',
-        'attribute vec3 vertexColor;',
         'uniform mediump float pointSize;',
         'uniform mat4 modelViewMatrix;',
         'uniform mat4 projectionMatrix;',
@@ -403,7 +402,7 @@ vgl.utils.createPointSpritesVertexShader = function(context) {
         '{',
         'gl_PointSize = pointSize;',
         'gl_Position = projectionMatrix * modelViewMatrix * vec4(vertexPosition, 1.0);',
-        ' iVertexColor = vertexColor;', '}' ].join('\n'),
+        ' iVertexColor = vec3(1.0, 1.0, 1.0);', '}' ].join('\n'),
       shader = new vgl.shader(gl.VERTEX_SHADER);
   shader.setShaderSource(vertexShaderSource);
   return shader;
@@ -428,8 +427,8 @@ vgl.utils.createPointSpritesFragmentShader = function(context) {
         'uniform mediump float vertexColorWeight;',
         'void main(void) {',
         'highp vec4 texColor = texture2D(sampler2d, gl_PointCoord);',
-        'highp vec3 finalColor = iVertexColor * vertexColorWeight + (1.0 - vertexColorWeight) * texColor.xyz;',
-        'gl_FragColor = vec4(finalColor, 0.2 * texColor.w);',
+        'highp vec3 finalColor = iVertexColor * 0.5 + (1.0 - 0.5) * texColor.xyz;',
+        'gl_FragColor = vec4(finalColor, texColor.w);',
         '}' ].join('\n'),
     shader = new vgl.shader(gl.FRAGMENT_SHADER);
 
@@ -742,7 +741,7 @@ vgl.utils.createPointSpritesMaterial = function(image) {
       vertexShader = vgl.utils.createPointSpritesVertexShader(gl),
       fragmentShader = vgl.utils.createPointSpritesFragmentShader(gl),
       posVertAttr = new vgl.vertexAttribute("vertexPosition"),
-      colorVertAttr = new vgl.vertexAttribute("vertexColor"),
+      //colorVertAttr = new vgl.vertexAttribute("vertexColor"),
       pointsizeUniform = new vgl.floatUniform("pointSize", 20.0),
       opacityUniform = new vgl.floatUniform("opacity", 1.0),
       vertexColorWeightUniform =
@@ -754,7 +753,7 @@ vgl.utils.createPointSpritesMaterial = function(image) {
 
   samplerUniform.set(0);
   prog.addVertexAttribute(posVertAttr, vgl.vertexAttributeKeys.Position);
-  prog.addVertexAttribute(colorVertAttr, vgl.vertexAttributeKeys.Color);
+  //prog.addVertexAttribute(colorVertAttr, vgl.vertexAttributeKeys.Color);
   prog.addUniform(pointsizeUniform);
   prog.addUniform(opacityUniform);
   prog.addUniform(vertexColorWeightUniform);
