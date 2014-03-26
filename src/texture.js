@@ -451,6 +451,12 @@ vgl.lookupTable = function() {
    */
   /////////////////////////////////////////////////////////////////////////////
   this.setup = function(renderState) {
+    if (this.textureUnit() === 0) {
+      gl.activeTexture(gl.TEXTURE0);
+    } else if (this.textureUnit() === 1) {
+      gl.activeTexture(gl.TEXTURE1);
+    }
+
     gl.deleteTexture(this.m_textureHandle);
     this.m_textureHandle = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, this.m_textureHandle);

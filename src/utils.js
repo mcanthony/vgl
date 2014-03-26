@@ -777,6 +777,7 @@ vgl.utils.createPointSpritesMaterial = function(image) {
 
 
   texture.setImage(image);
+  texture.setTextureUnit(0);
   mat.addAttribute(texture);
   return mat;
 };
