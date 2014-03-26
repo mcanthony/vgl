@@ -423,13 +423,13 @@ vgl.utils.createPointSpritesFragmentShader = function(context) {
   'use strict';
   var fragmentShaderSource = [
         'varying mediump vec3 iVertexColor;',
-        'uniform sampler2D sampler2d;',
-        'uniform sampler2D lookupTable;',
+        'uniform sampler2D opacityLookup;',
+        'uniform sampler2D scalarsToColors;',
         'uniform mediump float opacity;',
         'uniform mediump float vertexColorWeight;',
         'void main(void) {',
-        'highp float texOpacity = texture2D(sampler2d, gl_PointCoord).w;',
-        'gl_FragColor = vec4(texture2D(lookupTable, gl_PointCoord).xyz, texOpacity);',
+        'highp float texOpacity = texture2D(opacityLookup, gl_PointCoord).w;',
+        'gl_FragColor = vec4(texture2D(scalarsToColors, gl_PointCoord).xyz, texOpacity);',
         '}' ].join('\n'),
     shader = new vgl.shader(gl.FRAGMENT_SHADER);
 
@@ -750,10 +750,14 @@ vgl.utils.createPointSpritesMaterial = function(image) {
         new vgl.floatUniform("vertexColorWeight", 0.0),
       modelViewUniform = new vgl.modelViewUniform("modelViewMatrix"),
       projectionUniform = new vgl.projectionUniform("projectionMatrix"),
-      samplerUniform = new vgl.uniform(gl.INT, "sampler2d"),
-      texture = new vgl.texture();
+      samplerUniform = new vgl.uniform(gl.INT, "opacityLookup"),
+      scalarsToColors = new vgl.uniform(gl.INT, "scalarsToColors"),
+      texture = new vgl.texture(),
+      lut = vgl.lookupTable();
 
   samplerUniform.set(0);
+  scalarsToColors.set(1);
+
   prog.addVertexAttribute(posVertAttr, vgl.vertexAttributeKeys.Position);
   //prog.addVertexAttribute(colorVertAttr, vgl.vertexAttributeKeys.Color);
   prog.addUniform(pointsizeUniform);
@@ -762,10 +766,15 @@ vgl.utils.createPointSpritesMaterial = function(image) {
   prog.addUniform(vertexColorWeightUniform);
   prog.addUniform(modelViewUniform);
   prog.addUniform(projectionUniform);
+  prog.addUniform(samplerUniform);
+  prog.addUniform(scalarsToColors);
   prog.addShader(fragmentShader);
   prog.addShader(vertexShader);
   mat.addAttribute(prog);
   mat.addAttribute(blend);
+  lut.setTextureUnit(1);
+  mat.addAttribute(lut);
+
 
   texture.setImage(image);
   mat.addAttribute(texture);
