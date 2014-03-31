@@ -427,12 +427,14 @@ vgl.utils.createPointSpritesFragmentShader = function(context) {
         'varying mediump vec3 iVertexColor;',
         'varying highp float iVertexScalar;',
         'uniform sampler2D opacityLookup;',
+        'uniform highp float lutMin;',
+        'uniform highp float lutMax;',
         'uniform sampler2D scalarsToColors;',
         'uniform mediump float opacity;',
         'uniform mediump float vertexColorWeight;',
         'void main(void) {',
         'highp float texOpacity = texture2D(opacityLookup, gl_PointCoord).w;',
-        'gl_FragColor = vec4(texture2D(scalarsToColors, vec2(iVertexScalar / 20.0, 0.0)).xyz, 0.5);',
+        'gl_FragColor = vec4(texture2D(scalarsToColors, vec2((iVertexScalar - lutMin)/(lutMax - lutMin), 0.0)).xyz, 0.5);',
         '}' ].join('\n'),
     shader = new vgl.shader(gl.FRAGMENT_SHADER);
 
@@ -737,9 +739,10 @@ vgl.utils.createSolidColorMaterial = function(color) {
  * @returns {vgl.material}
  */
 //////////////////////////////////////////////////////////////////////////////
-vgl.utils.createPointSpritesMaterial = function(image) {
+vgl.utils.createPointSpritesMaterial = function(image, lut) {
   'use strict';
-  var mat = new vgl.material(),
+  var scalarRange = lut.range(),
+      mat = new vgl.material(),
       blend = new vgl.blend(),
       prog = new vgl.shaderProgram(),
       vertexShader = vgl.utils.createPointSpritesVertexShader(gl),
@@ -751,15 +754,19 @@ vgl.utils.createPointSpritesMaterial = function(image) {
       heightUniform = new vgl.floatUniform("height", 0.0),
       vertexColorWeightUniform =
         new vgl.floatUniform("vertexColorWeight", 0.0),
+      lutMinUniform = new vgl.floatUniform("lutMin", scalarRange[0]),
+      lutMaxUniform = new vgl.floatUniform("lutMax", scalarRange[1]),
       modelViewUniform = new vgl.modelViewUniform("modelViewMatrix"),
       projectionUniform = new vgl.projectionUniform("projectionMatrix"),
       samplerUniform = new vgl.uniform(gl.INT, "opacityLookup"),
       scalarsToColors = new vgl.uniform(gl.INT, "scalarsToColors"),
-      texture = new vgl.texture(),
-      lut = vgl.lookupTable();
+      texture = new vgl.texture();
 
   samplerUniform.set(0);
   scalarsToColors.set(1);
+
+  console.log('...... scalarRange ', scalarRange[0]);
+  console.log('...... scalarRange ', scalarRange[1]);
 
   prog.addVertexAttribute(posVertAttr, vgl.vertexAttributeKeys.Position);
   //prog.addVertexAttribute(colorVertAttr, vgl.vertexAttributeKeys.Color);
@@ -771,6 +778,8 @@ vgl.utils.createPointSpritesMaterial = function(image) {
   prog.addUniform(projectionUniform);
   prog.addUniform(samplerUniform);
   prog.addUniform(scalarsToColors);
+  prog.addUniform(lutMinUniform);
+  prog.addUniform(lutMaxUniform);
   prog.addShader(fragmentShader);
   prog.addShader(vertexShader);
   mat.addAttribute(prog);
