@@ -765,9 +765,6 @@ vgl.utils.createPointSpritesMaterial = function(image, lut) {
   samplerUniform.set(0);
   scalarsToColors.set(1);
 
-  console.log('...... scalarRange ', scalarRange[0]);
-  console.log('...... scalarRange ', scalarRange[1]);
-
   prog.addVertexAttribute(posVertAttr, vgl.vertexAttributeKeys.Position);
   //prog.addVertexAttribute(colorVertAttr, vgl.vertexAttributeKeys.Color);
   prog.addUniform(pointsizeUniform);
@@ -777,16 +774,18 @@ vgl.utils.createPointSpritesMaterial = function(image, lut) {
   prog.addUniform(modelViewUniform);
   prog.addUniform(projectionUniform);
   prog.addUniform(samplerUniform);
-  prog.addUniform(scalarsToColors);
-  prog.addUniform(lutMinUniform);
-  prog.addUniform(lutMaxUniform);
   prog.addShader(fragmentShader);
   prog.addShader(vertexShader);
   mat.addAttribute(prog);
   mat.addAttribute(blend);
-  lut.setTextureUnit(1);
-  mat.addAttribute(lut);
 
+  if (lut) {
+    prog.addUniform(scalarsToColors);
+    prog.addUniform(lutMinUniform);
+    prog.addUniform(lutMaxUniform);
+    lut.setTextureUnit(1);
+    mat.addAttribute(lut);
+  }
 
   texture.setImage(image);
   texture.setTextureUnit(0);
