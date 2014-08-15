@@ -174,17 +174,14 @@ vgl.utils.createPointVertexShader = function(context) {
   'use strict';
   var vertexShaderSource = [
         'attribute vec3 vertexPosition;',
-        'attribute vec3 vertexColor;',
-        'attribute float vertexSize;',
         'uniform mat4 modelViewMatrix;',
         'uniform mat4 projectionMatrix;',
         'varying mediump vec3 iVertexColor;',
         'varying highp vec3 iTextureCoord;',
         'void main(void)',
         '{',
-        'gl_PointSize =  vertexSize;',
         'gl_Position = projectionMatrix * modelViewMatrix * vec4(vertexPosition, 1.0);',
-        ' iVertexColor = vertexColor;', '}' ].join('\n'),
+         '}' ].join('\n'),
       shader = new vgl.shader(gl.VERTEX_SHADER);
 
   shader.setShaderSource(vertexShaderSource);
@@ -234,18 +231,15 @@ vgl.utils.createVertexShaderColorMap = function(context, min, max) {
   'use strict';
   var vertexShaderSource = [
         'attribute vec3 vertexPosition;',
-        'attribute float vertexScalar;',
         'uniform mediump float pointSize;',
         'uniform mat4 modelViewMatrix;',
         'uniform mat4 projectionMatrix;',
         'uniform float lutMin;',
         'uniform float lutMax;',
-        'varying mediump float iVertexScalar;',
         'void main(void)',
         '{',
         'gl_PointSize = pointSize;',
         'gl_Position = projectionMatrix * modelViewMatrix * vec4(vertexPosition, 1.0);',
-        'iVertexScalar = (vertexScalar-lutMin)/(lutMax-lutMin);',
         '}' ].join('\n'),
       shader = new vgl.shader(gl.VERTEX_SHADER);
 
@@ -265,10 +259,9 @@ vgl.utils.createVertexShaderColorMap = function(context, min, max) {
 //////////////////////////////////////////////////////////////////////////////
 vgl.utils.createFragmentShader = function(context) {
   'use strict';
-  var fragmentShaderSource = [ 'varying mediump vec3 iVertexColor;',
-                              'uniform mediump float opacity;',
+  var fragmentShaderSource = ['uniform mediump float opacity;',
                               'void main(void) {',
-                              'gl_FragColor = vec4(iVertexColor, opacity);',
+                              'gl_FragColor = vec4(1.0, 0.0, 0.0, opacity);',
                               '}' ].join('\n'),
       shader = new vgl.shader(gl.FRAGMENT_SHADER);
 
@@ -604,8 +597,8 @@ vgl.utils.createPointGeometryMaterial = function(opacity) {
        projectionUniform = new vgl.projectionUniform("projectionMatrix");
 
   prog.addVertexAttribute(posVertAttr, vgl.vertexAttributeKeys.Position);
-  prog.addVertexAttribute(colorVertAttr, vgl.vertexAttributeKeys.Color);
-  prog.addVertexAttribute(sizeVertAttr, vgl.vertexAttributeKeys.Scalar);
+//  prog.addVertexAttribute(colorVertAttr, vgl.vertexAttributeKeys.Color);
+//  prog.addVertexAttribute(sizeVertAttr, vgl.vertexAttributeKeys.Scalar);
   prog.addUniform(opacityUniform);
   prog.addUniform(modelViewUniform);
   prog.addUniform(projectionUniform);
